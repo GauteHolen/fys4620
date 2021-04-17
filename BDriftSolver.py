@@ -50,6 +50,9 @@ class BDriftSolver:
     
     def runEulerCromer(self,delta_t,t_n):
         
+        #offsets starting position with r_g
+        r_g = self.m*self.v[1]/(abs(self.q)*self.B_0[2])
+        
         positions=[self.r]
         x=[self.r[0]]
         y=[self.r[1]]
@@ -65,6 +68,7 @@ class BDriftSolver:
         t=np.empty((N,1))
         
         r_current=self.r
+        r_current[0]=r_g
         v_current=self.v
         
         
@@ -88,35 +92,33 @@ class BDriftSolver:
         return x,y,z,t
     
     
-    def runVerletVelocity(self,delta_t,t_n):
-        x=[self.r[0]]
-        y=[self.r[1]]
-        z=[self.r[2]]
-        t=[0]
+    def runGyrocenterApprox(self,delta_t,t_n):
         
-        a_old=0
+        K_perp=0.5*self.m*self.v[1]**2
+        
+        BgradB2 = np.cross(self.B_0,self.Bgrad)/(self.B_0[2]**2)
         
         
-        while self.t<t_n:
-            
-            r_current=self.r
-            v_current=self.v
-            
-            a_current=self.acceleration(r_current,v_current)
-            r_new=r_current+v_current*delta_t+(1/6)*(4*a_current-a_old)*delta_t*delta_t
-            
-            
-            
-            
-        
-            self.t+=delta_t
-            
-            x.append(r_new[0])
-            y.append(r_new[1])
-            z.append(r_new[2])
-            t.append(self.t)
+        v_drift = BgradB2*K_perp/(self.q*self.B_0[2])
         
         
+        N=int(t_n/delta_t)
+        x=np.empty((N,1))
+        y=np.empty((N,1))
+        z=np.empty((N,1))
+        t=np.empty((N,1))
+        x_drift=0
+        tt=0
+        for i in range(N):
+            tt+=delta_t
+            
+            x[i]=x_drift
+            x_drift+=v_drift[0]*delta_t
+            y[i]=0
+            z[i]=0
+            t[i]=tt
+        
+        return x,y,z,t
         
         
         

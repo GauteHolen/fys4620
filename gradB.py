@@ -7,7 +7,6 @@ Created on Tue Apr 13 12:00:13 2021
 
 import matplotlib.pyplot as plt
 from mpl_toolkits import mplot3d
-from matplotlib.transforms import Bbox, TransformedBbox
 
 from BDriftSolver import BDriftSolver as Solver
 
@@ -17,7 +16,7 @@ r_0=[0,0,0]
 v_0=[0,10**(5),0]
 
 #Magnetic field gradient and magnetic field given in Tesla
-B_grad=[0,5*10**(-6),0]
+B_grad=[0,5*10**(-4),0]
 B_0=[0,0,50*10**(-6)]
 
 
@@ -42,16 +41,20 @@ delta_t=t_n*10**(-4)
 
 solver = Solver(t_0,r_0,v_0,m,B_0,B_grad,q)
 x,y,z,t = solver.runEulerCromer(delta_t,t_n)
+x_gc,y_gc,z_gc,t_gc = solver.runGyrocenterApprox(delta_t,t_n)
+
 
 r_g = m*v_0[1]/(abs(q)*B_0[2])
 print("theoretical gyroradius: ",r_g)
 print("simulated gyroradius: ", max(y))
 
-if q>1:
-    legend=['proton']
-else:
-    legend=['electron']
 
+if q>1:
+    kind='Proton'
+else:
+    kind='Electron'
+
+legend=['Euler Cromer','Gyrocenter Approx']
 
 s=str('$v_0=$'+str(format(v_0[1],'.3E'))+'m/s'+
       ', $B_{grad y} =$'+str(format(B_grad[1],'.3E'))+'T/m'+
@@ -59,20 +62,24 @@ s=str('$v_0=$'+str(format(v_0[1],'.3E'))+'m/s'+
 
 fig1, ax1 = plt.subplots()
 ax1 = plt.axes(projection='3d')
-ax1.scatter3D(x,t,y)
+ax1.scatter3D(x,t,y,s=0.5)
+ax1.scatter3D(x_gc,t_gc,y_gc,s=0.5)
 ax1.set_xlabel('X [m]')
 ax1.set_ylabel('time [s]')
 ax1.set_zlabel('Y [m]')
 plt.ticklabel_format(axis="y", style="sci", scilimits=(0,0))
-ax1.legend(legend)
-ax1.set_title('Trajectory on XY plane in time with '+'\n'+s)
+ax1.legend(legend, loc='best')
+ax1.set_title(kind+' trajectory on XY plane in time with '+'\n'+s+'\n')
+plt.tight_layout()
 #ax1.annotate('$v_0=$'+str(v_0[2])+'m/s')
 
 fig2, ax2 = plt.subplots()
 ax2.plot(x,y)
+ax2.plot(x_gc,y_gc)
 ax2.set_xlabel('X [m]')
 ax2.set_ylabel('Y [m]')
-ax2.legend(legend)
+ax2.legend(legend, loc='upper left')
 
-ax2.set_title('Trajectory on XY plane with '+'\n'+s)
+ax2.set_title(kind+' trajectory on XY plane with '+'\n'+s)
+plt.tight_layout()
 
