@@ -51,7 +51,7 @@ class BDriftSolver:
     def runEulerCromer(self,delta_t,t_n):
         
         #offsets starting position with r_g
-        r_g = self.m*self.v[1]/(abs(self.q)*self.B_0[2])
+        r_g = self.m*self.v[1]/(-1*self.q*self.B_0[2])
         
         positions=[self.r]
         x=[self.r[0]]
