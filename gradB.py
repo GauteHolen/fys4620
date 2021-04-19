@@ -6,15 +6,16 @@ Created on Tue Apr 13 12:00:13 2021
 """
 
 import matplotlib.pyplot as plt
+from math import sqrt
 from mpl_toolkits import mplot3d
 
 from BDriftSolver import BDriftSolver as Solver
 
 t_0=0
-
+eVtoJ = 1.60217662 * 10 **-19
 
 #1 is electron, 2 is proton
-run=2
+run=1
 
 
 #Mass in KG
@@ -24,9 +25,9 @@ m_p=1.6726219*10**(-27)
 q_e=-1.602176634*10**(-19)
 q_p=1.602176634*10**(-19)
 
-v_e=5.344286*10**(-28)/m_e
+v_e=sqrt(2*eVtoJ/m_e)
 
-v_p=5.344286 * 10**(-28)/m_p
+v_p=sqrt(2*eVtoJ/m_p)
 
 
 #Initial position and velocity
@@ -34,7 +35,7 @@ r_0=[0,0,0]
 
 
 #Magnetic field gradient and magnetic field given in Tesla
-B_grad=[0,5*10**(-4),0]
+B_grad=[0,5*10**(-4),0] #change this value
 B_0=[0,0,50*10**(-6)]
 
 
